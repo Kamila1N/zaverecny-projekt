@@ -4,6 +4,7 @@ import logo from '../../assets/logo.jpg'
 import searchIcon from '../../assets/loupe.png'
 import heartIcon from '../../assets/heart.png'
 import closeIcon from '../../assets/close.png'
+import heartBlackIcon from '../../assets/heart-black.png'
 
 export function Header() {
     const [isOpen, setIsOpen] = useState(false);
@@ -13,12 +14,16 @@ export function Header() {
         <header
             className="text-teal-600 py-10 px-10 lg:flex md:justify-between md:items-center bg-white shadow-md relative">
             <div className="flex justify-between items-center md:justify-center">
+
                 <h1 className="text-4xl font-bold italic flex items-center">
-                    <img src={logo} alt="logo" className="w-20 h-20"/>
-                    RecipeBook
+                    <a href="/" className="flex items-center">
+                        <img src={logo} alt="logo" className="w-20 h-20"/>
+                        RecipeBook
+                    </a>
                 </h1>
 
-                <button className="md:hidden text-3xl" onClick={() => setIsOpen(!isOpen)}>
+
+            <button className="md:hidden text-3xl" onClick={() => setIsOpen(!isOpen)}>
                     &#9776;
                 </button>
             </div>
@@ -37,7 +42,7 @@ export function Header() {
                          className="w-7 h-7 hover:scale-130 transition-transform duration-300 ease-in-out"/>
                 </button>
                 <a className="text-black font-medium px-8 py-2"
-                   href={"/favorite"}><img src={heartIcon} alt="favorite"
+                   href={"/favorite"}><img src={heartBlackIcon} alt="favorite"
                                            className="w-7 h-7 hover:scale-130 transition-transform duration-300 ease-in-out"/></a>
 
 
@@ -49,10 +54,10 @@ export function Header() {
                     onClick={() => setShowSearch(false)}
                 >
                     <div
-                        className="bg-white rounded-xl p-8 shadow-lg flex gap-5 md:w-max mt-10 flex items-center justify-center relative"
+                        className="bg-white rounded-xl p-8 shadow-lg flex gap-5 md:w-max flex items-center justify-center relative"
                         onClick={e => e.stopPropagation()}
                     >
-                        <button className="absolute md:-top-1 md:-right-3 top-23"
+                        <button className="absolute -top-1 -right-3"
                         onClick={() => setShowSearch(false)}>
                             <img src={closeIcon} alt="close"
                             className="w-7 h-7 hover:scale-130 transition-transform duration-300 ease-in-out "/>
