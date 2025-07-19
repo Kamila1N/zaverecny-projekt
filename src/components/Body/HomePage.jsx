@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState,useRef} from "react";
 
 import prava from "../../assets/prava.png";
 import leva from "../../assets/leva.png";
@@ -15,13 +15,33 @@ const images = [jidlo1, jidlo2,jidlo3, jidlo4, jidlo5, jidlo6
 
 export function HomePage() {
     const [current, setCurrent] = useState(0);
+    const intervalRef = useRef(null);
+
+    useEffect(() => {
+       startAutoSlide();
+       return () => {clearInterval(intervalRef.current);};
+    })
+
+    const startAutoSlide = () => {
+        clearInterval(intervalRef.current);
+        intervalRef.current = setInterval(() => {
+            setCurrent((prev) => (prev + 1) % images.length);
+        }, 5000); // Change image every 3 seconds
+    }
 
 
-    const prev = () => setCurrent((current - 1 + images.length) % images.length);
-    const next = () => setCurrent((current + 1) % images.length);
+    const prev = () => {
+        setCurrent((current - 1 + images.length) % images.length);
+        startAutoSlide();
+    };
+
+    const next = () => {
+        setCurrent((current + 1) % images.length);
+        startAutoSlide();
+    }
 
     return (
-        <>
+        <div className="pt-[190px] md:pt-[260px] lg:pt-[200px] px-4 md:px-10 lg:px-20">
 
             <div className="flex flex-col items-center mt-10">
                 <div
@@ -63,6 +83,6 @@ export function HomePage() {
                 oblíbené a užijte si vaření!
             </p>
             </div>
-        </>
+        </div>
     );
 }
