@@ -1,0 +1,22 @@
+
+//.menu{
+//  display: flex;
+//    gap: 10px;
+//}
+
+//.menu a{
+//   color: black;
+//    padding: 10px 20px;
+//    text-decoration: none;
+//
+//}
+
+//.menu a:hover{
+//    color: teal;
+//}
+.menu a img {
+  transition: filter 0.2s;
+}
+.menu a:hover img {
+  filter: brightness(0.4) saturate(100%) invert(20%) sepia(98%) saturate(1000%) hue-rotate(140deg);
+}
