@@ -13,6 +13,7 @@
     "@ark-ui/react": "^5.17.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.2.0",
     "@mui/joy": "^5.0.0-beta.52",
     "@tailwindcss/vite": "^4.1.11",
     "react": "^19.1.0",

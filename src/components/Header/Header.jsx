@@ -11,9 +11,9 @@ export function Header() {
 
     return (
 
-        <header className="bg-white shadow-md pb-10 fixed top-0 left-0 w-full z-100">
+        <header className="bg-white shadow-md pb-4 fixed top-0 left-0 w-full z-100">
 
-            <div className="text-teal-600 pt-5 pb-5 px-10 lg:flex md:justify-between md:items-center  relative">
+            <div className="text-teal-600 pt-5 px-10  lg:flex md:justify-between md:items-center  relative">
 
                 <div className="flex justify-between items-center md:justify-center">
 
@@ -32,9 +32,9 @@ export function Header() {
                 <nav
                     className={`flex flex-col md:flex-row justify-center items-center mt-5 lg:mt-0 ${isOpen ? '' : 'hidden'} md:flex`}>
 
-                    <a className="bg-teal-600 hover:bg-teal-400 text-white font-bold px-10 py-2 border border-teal-600 rounded-xl"
+                    <a className="bg-teal-600 hover:bg-teal-400 text-white font-bold px-5 py-1 border border-teal-600 rounded-xl"
                        href={"/newRecipes"}>Přidat recept</a>
-                    <a className="text-black font-medium px-8 py-2 hover:text-teal-600"
+                    <a className="text-black font-medium px-5 py-2 hover:text-teal-600"
                        href={"/"}>Recepty</a>
                     <a className="text-black font-medium px-5 py-2 flex items-center gap-2 hover:text-teal-600"
                        href={"/favorite"}>
@@ -44,8 +44,8 @@ export function Header() {
                 </nav>
             </div>
 
-            <div className="flex justify-center items-center gap-4 px-10">
-                <div className="flex items-center gap-4 px-4 md:w-auto">
+            <div className=" flex justify-center items-centerpx-5">
+                <div className="flex items-center gap-4 px-4 md:w-auto mt-2">
 
                     <input
                         type="text"

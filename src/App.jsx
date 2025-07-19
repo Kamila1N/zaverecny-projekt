@@ -5,6 +5,7 @@ import {HomePage} from './components/Body/HomePage.jsx'
 
 
 
+
 function App() {
 
 
@@ -12,6 +13,7 @@ function App() {
     <>
       <Header/>
         <HomePage />
+
     </>
   )
 }

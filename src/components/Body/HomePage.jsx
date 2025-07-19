@@ -1,4 +1,6 @@
 import {useEffect, useState,useRef} from "react";
+import {Recipes} from "./Recipes.jsx";
+import {Articles} from "./Articles.jsx";
 
 import prava from "../../assets/prava.png";
 import leva from "../../assets/leva.png";
@@ -41,11 +43,11 @@ export function HomePage() {
     }
 
     return (
-        <div className="pt-[190px] md:pt-[260px] lg:pt-[200px] px-4 md:px-10 lg:px-20">
+        <div className="pt-[150px] md:pt-[210px] lg:pt-[150px] px-4 md:px-10 lg:px-20 max-w-[1700px] mx-auto">
 
             <div className="flex flex-col items-center mt-10">
                 <div
-                    className="relative max-w-[1500px] w-full h-[300px] object-cover flex items-center justify-center rounded-xl overflow-hidden">
+                    className="relative max-w-[1500px] w-full h-[100px] md:h-[170px] lg:h-[200px] xl:h-[250px] 2xl:h-[300px] object-cover flex items-center justify-center rounded-xl overflow-hidden">
                     <button
                         onClick={prev}
                         className="absolute left-5 rounded-full p-2"
@@ -75,14 +77,25 @@ export function HomePage() {
             </div>
 
             <div className="flex flex-col items-center">
-            <h1 className="text-4xl font-bold text-teal-600 mt-8 mb-4 text-center">
+            <h1 className=" text-2xl md:text-4xl lg:text-5xl font-bold text-teal-600 mt-8 mb-4 text-center">
                 Skvělé recepty pro každý den
             </h1>
-            <p className="text-lg text-gray-600 mb-8 text-center max-w-2xl">
+            <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-8 text-center max-w-2xl">
                 Objevte inspiraci na chutná jídla, která si můžete připravit kdykoliv. Procházejte recepty, vybírejte
                 oblíbené a užijte si vaření!
             </p>
             </div>
+            <div>
+                <h2 className="text-base text-center md:text-lg md:text-start lg:text-2xl mt-5 mb-5 border-b-2 border-gray-500">Doporučujeme </h2>
+                <Recipes  />
+            </div>
+            <div>
+                <h2 className="text-base text-center md:text-lg md:text-start lg:text-2xl mt-5 mb-5 border-b-2 border-gray-500">
+                Rady a typy pro snadné vaření
+                     </h2>
+
+            </div>
+
         </div>
     );
 }
