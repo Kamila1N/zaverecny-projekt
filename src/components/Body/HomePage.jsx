@@ -1,5 +1,6 @@
 import {useEffect, useState,useRef} from "react";
 import {Recipes} from "./Recipes.jsx";
+
 import {Articles} from "./Articles.jsx";
 
 import prava from "../../assets/prava.png";
@@ -87,7 +88,10 @@ export function HomePage() {
             </div>
             <div>
                 <h2 className="text-base text-center md:text-lg md:text-start lg:text-2xl mt-5 mb-5 border-b-2 border-gray-500">Doporučujeme </h2>
-                <Recipes  />
+
+               {/*//zde potřebuju zobrazit recepty které mají hodnocení vyšší jak 4*/}
+
+                <Recipes />
             </div>
             <div>
                 <h2 className="text-base text-center md:text-lg md:text-start lg:text-2xl mt-5 mb-5 border-b-2 border-gray-500">

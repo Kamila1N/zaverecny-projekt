@@ -1,17 +1,4 @@
-import * as React from 'react';
-import AspectRatio from '@mui/joy/AspectRatio';
-import Avatar from '@mui/joy/Avatar';
-import Box from '@mui/joy/Box';
-import Card from '@mui/joy/Card';
-import IconButton from '@mui/joy/IconButton';
-import Typography from '@mui/joy/Typography';
-import Link from '@mui/joy/Link';
-import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
-import {Recipe} from './Recipe'; // Import Recipe component
-
-//zatím si tady dám data ručně, ale časem to budu tahat z API
-
-const recipesData = [
+export const recipesData = [
     {
         title: "Palačinky s javorovým sirupem",
         time: "20 min",
@@ -21,7 +8,7 @@ const recipesData = [
     {
         title: "Pravé italské tiramisu z vaječných žloutků",
         time: "30 min",
-        rating: 4,
+        rating: 2.5,
         img: "https://www.womanonly.cz/wp-content/uploads/fly-images/18350/tiramisu2-1048x0-c.jpg"
     },
 
@@ -40,13 +27,13 @@ const recipesData = [
     {
         title: "Kuřecí prsa ve sladkokyselé omačce",
         time: "35 min",
-        rating: 5,
+        rating: 3,
         img: "https://static.toprecepty.cz/fotky/recepty/0112/lepkave-kruti-kousky-189154-1920-1080-nwo.webp"
     },
     {
         title: "Krtkův dort s banány a čokoládou",
         time: "60 min",
-        rating: 4.5,
+        rating: 3.5,
         img: "https://static.toprecepty.cz/fotky/recepty/0472/krtkuv-dort-na-plechu-224742-1920-1080-nwo.webp"
     }
     ,
@@ -58,23 +45,3 @@ const recipesData = [
     }
     // Přidej další recepty podle potřeby
 ];
-
-export function Recipes() {
-
-    const doporucujeme = recipesData.filter(recept => recept.rating >= 4);
-
-    return (
-        <Box sx={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: 2,
-            minHeight: 250,
-            justifyItems: 'center'
-                        }}>
-                        {doporucujeme.map((recept, idx) => (
-                            <Recipe key={idx} recept={recept} />
-                        ))}
-
-        </Box>
-    );
-}
