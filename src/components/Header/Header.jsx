@@ -14,11 +14,11 @@ export function Header() {
 
         <header className="bg-white shadow-md pb-4 fixed top-0 left-0 w-full z-100">
 
-            <div className="text-teal-600 pt-5 px-10  lg:flex md:justify-between md:items-center  relative">
+            <div className="text-teal-600 pt-5 px-5 lg:flex md:justify-between md:items-center md:px-10 relative">
 
                 <div className="flex justify-between items-center md:justify-center">
 
-                    <h1 className="text-4xl font-bold italic flex items-center">
+                    <h1 className="text-4xl md:text-5xl lg:6xl font-bold italic flex items-center">
                         <NavLink to="/" className="flex items-center">
                             <img src={logo} alt="logo" className="w-20 h-20"/>
                             RecipeBook

@@ -78,27 +78,28 @@ export function HomePage() {
             </div>
 
             <div className="flex flex-col items-center">
-            <h1 className=" text-2xl md:text-4xl lg:text-5xl font-bold text-teal-600 mt-8 mb-4 text-center">
-                Skvělé recepty pro každý den
-            </h1>
-            <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-8 text-center max-w-2xl">
-                Objevte inspiraci na chutná jídla, která si můžete připravit kdykoliv. Procházejte recepty, vybírejte
-                oblíbené a užijte si vaření!
-            </p>
+                <h1 className=" text-2xl md:text-4xl lg:text-5xl font-bold text-teal-600 mt-8 mb-4 text-center">
+                    Skvělé recepty pro každý den
+                </h1>
+                <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-8 text-center max-w-2xl">
+                    Objevte inspiraci na chutná jídla, která si můžete připravit kdykoliv. Procházejte recepty,
+                    vybírejte
+                    oblíbené a užijte si vaření!
+                </p>
             </div>
             <div>
                 <h2 className="text-base text-center md:text-lg md:text-start lg:text-2xl mt-5 mb-5 border-b-2 border-gray-500">Doporučujeme </h2>
 
-               {/*//zde potřebuju zobrazit recepty které mají hodnocení vyšší jak 4*/}
+                {/*//zde potřebuju zobrazit recepty které mají hodnocení vyšší jak 4*/}
 
-                <Recipes />
+                <Recipes/>
             </div>
+
             <div>
-                <h2 className="text-base text-center md:text-lg md:text-start lg:text-2xl mt-5 mb-5 border-b-2 border-gray-500">
-                Rady a typy pro snadné vaření
-                     </h2>
-
-
+                <h2 className="text-base text-center md:text-lg md:text-start lg:text-2xl mt-10 mb-5 border-b-2 border-gray-500">
+                    Rady a typy pro snadné vaření
+                </h2>
+                <Articles />
             </div>
 
         </div>

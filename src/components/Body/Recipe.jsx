@@ -44,7 +44,7 @@ export function Recipe({ recept}) {
             <AspectRatio variant="soft" sx={{ width: '100%' }}>
                 <img src={recept.img} loading="lazy" alt={recept.title} />
             </AspectRatio>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
                 <Typography level="title-lg">
                     <Link href="#" overlay underline="none">
                         {recept.title}
