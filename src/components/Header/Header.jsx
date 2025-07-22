@@ -4,6 +4,7 @@ import logo from '../../assets/logo.jpg'
 import searchIcon from '../../assets/loupe.png'
 import heartIcon from '../../assets/heart.png'
 import heartBlackIcon from '../../assets/heart-black.png'
+import {NavLink} from "react-router-dom";
 
 export function Header() {
     const [isOpen, setIsOpen] = useState(false);
@@ -18,10 +19,11 @@ export function Header() {
                 <div className="flex justify-between items-center md:justify-center">
 
                     <h1 className="text-4xl font-bold italic flex items-center">
-                        <a href="/" className="flex items-center">
+                        <NavLink to="/" className="flex items-center">
                             <img src={logo} alt="logo" className="w-20 h-20"/>
                             RecipeBook
-                        </a>
+                        </NavLink>
+
                     </h1>
 
 
@@ -32,14 +34,14 @@ export function Header() {
                 <nav
                     className={`flex flex-col md:flex-row justify-center items-center mt-5 lg:mt-0 ${isOpen ? '' : 'hidden'} md:flex`}>
 
-                    <a className="bg-teal-600 hover:bg-teal-400 text-white font-bold px-5 py-1 border border-teal-600 rounded-xl"
-                       href={"/newRecipes"}>Přidat recept</a>
-                    <a className="text-black font-medium px-5 py-2 hover:text-teal-600"
-                       href={"/"}>Recepty</a>
-                    <a className="text-black font-medium px-5 py-2 flex items-center gap-2 hover:text-teal-600"
-                       href={"/favorite"}>
+                    <NavLink className="bg-teal-600 hover:bg-teal-400 text-white font-bold px-5 py-1 border border-teal-600 rounded-xl"
+                       to={"/newRecipes"}>Přidat recept</NavLink>
+                    <NavLink className="text-black font-medium px-5 py-2 hover:text-teal-600"
+                       to="/recipes-list">Recepty</NavLink>
+                    <NavLink className="text-black font-medium px-5 py-2 flex items-center gap-2 hover:text-teal-600"
+                       to={"/favorite"}>
                         <span className="hidden md:inline">Oblíbené</span>
-                        <img src={heartBlackIcon} alt="favorite" className="w-7 h-7"/></a>
+                        <img src={heartBlackIcon} alt="favorite" className="w-7 h-7"/></NavLink>
 
                 </nav>
             </div>
