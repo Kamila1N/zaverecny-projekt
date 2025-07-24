@@ -1,6 +1,6 @@
 import {useEffect, useState,useRef} from "react";
 import {Recipes} from "./Recipes.jsx";
-
+import {supabase} from "../../supabase.js";
 import {Articles} from "./Articles.jsx";
 
 import prava from "../../assets/prava.png";
@@ -18,6 +18,7 @@ const images = [jidlo1, jidlo2,jidlo3, jidlo4, jidlo5, jidlo6
 ];
 
 export function HomePage() {
+    const [recipes, setRecipes] = useState([]);
     const [current, setCurrent] = useState(0);
     const intervalRef = useRef(null);
 
@@ -25,6 +26,16 @@ export function HomePage() {
        startAutoSlide();
        return () => {clearInterval(intervalRef.current);};
     })
+
+    useEffect(() => {
+        const fetchRecipes = async () => {
+            const { data, error } = await supabase.from("recipes").select("*");
+            if (!error) setRecipes(data);
+        };
+        fetchRecipes();
+    }, []);
+
+    const filter = {rating: 4}
 
     const startAutoSlide = () => {
         clearInterval(intervalRef.current);
@@ -93,7 +104,7 @@ export function HomePage() {
 
                 {/*//zde potřebuju zobrazit recepty které mají hodnocení vyšší jak 4*/}
 
-                <Recipes filter={{rating: 4}}/>
+                <Recipes recipes={recipes} filter={filter}/>
             </div>
 
             <div>

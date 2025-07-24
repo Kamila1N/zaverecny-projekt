@@ -1,7 +1,4 @@
 import * as React from 'react';
-import {useEffect, useState} from "react";
-import {supabase} from "../../supabase.js";
-
 import Box from '@mui/joy/Box';
 import {Recipe} from './Recipe';
 
@@ -56,21 +53,9 @@ import {Recipe} from './Recipe';
 
 export function Recipes({recipes, filter}) {
 
-    const [recipes, setRecipes] = useState([]);
-
-    useEffect(() => {
-        getRecipes()
-    }, []);
-
-    const getRecipes = async () => {
-        let query = supabase.from("recipes").select('*');
-        if (filter?.rating) {
-            query = query.gte("rating", filter.rating);
-        }
-        const { data, error } = await query;
-        if (!error) setRecipes(data);
-
-    };
+    const filteredRecipes = filter?.rating
+        ? recipes.filter(r => r.rating >= filter.rating)
+        : recipes;
 
 
     return (
@@ -81,7 +66,7 @@ export function Recipes({recipes, filter}) {
             minHeight: 250,
             justifyItems: 'center'
                         }}>
-            {recipes.map(recept => (
+            {filteredRecipes.map(recept => (
                 <Recipe key={recept.id} recept={recept} />
             ))}
 
