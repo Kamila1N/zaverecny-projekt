@@ -56,64 +56,80 @@ export function HomePage() {
     }
 
     return (
-        <div className="pt-[150px] md:pt-[210px] lg:pt-[150px] px-4 md:px-10 lg:px-20 max-w-[1700px] mx-auto">
+        <>
+            <div className="bg-gradient-to-b from-teal-50 to-gray-100 ">
+                <div className="pt-[150px] md:pt-[210px] lg:pt-[150px] px-4 md:px-10 lg:px-20 max-w-[1600px] mx-auto pb-20 bg-white">
 
-            <div className="flex flex-col items-center mt-10">
-                <div
-                    className="relative max-w-[1500px] w-full h-[100px] md:h-[170px] lg:h-[200px] xl:h-[250px] 2xl:h-[300px] object-cover flex items-center justify-center rounded-xl overflow-hidden">
-                    <button
-                        onClick={prev}
-                        className="absolute left-5 rounded-full p-2"
-                    >
-                        <img src={leva} alt="prev" className={"w-7 h-7 bg-white/50"}/>
-                    </button>
-                    <img
-                        src={images[current]}
-                        alt={`Banner ${current + 1}`}
-                        className="w-full h-full object-cover rounded"
-                    />
-                    <button
-                        onClick={next}
-                        className="absolute right-0 rounded-full p-2"
-                    >
-                        <img src={prava} alt="next" className={"w-7 h-7 bg-white/50"}/>
-                    </button>
-                </div>
-                <div className="flex gap-2 mt-4">
-                    {images.map((_, idx) => (
+                    <div className="flex flex-col items-center mt-10">
                         <div
-                            key={idx}
-                            className={`w-3 h-3 rounded-full ${idx === current ? "bg-teal-600" : "bg-gray-300"}`}
-                        />
-                    ))}
+                            className="relative max-w-[1500px] w-full h-[100px] md:h-[170px] lg:h-[200px] xl:h-[250px] 2xl:h-[300px] object-cover flex items-center justify-center rounded-xl overflow-hidden">
+                            <button
+                                onClick={prev}
+                                className="absolute left-5 rounded-full p-2"
+                            >
+                                <img src={leva} alt="prev" className={"w-7 h-7 bg-white/50"}/>
+                            </button>
+                            <img
+                                src={images[current]}
+                                alt={`Banner ${current + 1}`}
+                                className="w-full h-full object-cover rounded"
+                            />
+                            <button
+                                onClick={next}
+                                className="absolute right-0 rounded-full p-2"
+                            >
+                                <img src={prava} alt="next" className={"w-7 h-7 bg-white/50"}/>
+                            </button>
+                        </div>
+                        <div className="flex gap-2 mt-4">
+                            {images.map((_, idx) => (
+                                <div
+                                    key={idx}
+                                    className={`w-3 h-3 rounded-full ${idx === current ? "bg-teal-600" : "bg-gray-300"}`}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col items-center">
+                        <h1 className=" text-2xl md:text-4xl lg:text-5xl font-bold text-teal-600 mt-8 mb-4 text-center">
+                            Skvělé recepty pro každý den
+                        </h1>
+                        <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-8 text-center max-w-2xl">
+                            Objevte inspiraci na chutná jídla, která si můžete připravit kdykoliv. Procházejte recepty,
+                            vybírejte
+                            oblíbené a užijte si vaření!
+                        </p>
+
+                    </div>
+
+
+                    <div>
+                        <h2 className="font-bold text-teal-800 flex items-center gap-2 text-2xl text-center md:text-start mt-10 mb-10 pl-5 border-b-2 border-teal-600">
+                            Doporučujeme </h2>
+
+
+                        {/*//zde potřebuju zobrazit recepty které mají hodnocení vyšší jak 4*/}
+
+                        <Recipes recipes={recipes} filter={filter}/>
+
+                    </div>
+                    <div>
+                        <h2 className="font-bold text-gray-700 flex items-center gap-2 text-2xl text-center md:text-start mt-20 border-b-2 pl-5 border-zinc-600">
+                            Rady a typy pro snadné vaření
+                        </h2>
+                        {/*<div*/}
+                        {/*    className="bg-teal-50  border-teal-600 p-4 rounded-md shadow text-base text-center md:text-lg md:text-start lg:text-2xl mt-10 mb-5">*/}
+                        {/*        <h2 className="text-xl font-bold text-teal-700 flex items-center gap-2">*/}
+                        {/*            <i className="fas fa-info-circle text-blue-500"></i>*/}
+                        {/*            Rady a tipy pro snadné vaření*/}
+                        {/*        </h2>*/}
+
+                        <Articles/>
+                    </div>
                 </div>
             </div>
 
-            <div className="flex flex-col items-center">
-                <h1 className=" text-2xl md:text-4xl lg:text-5xl font-bold text-teal-600 mt-8 mb-4 text-center">
-                    Skvělé recepty pro každý den
-                </h1>
-                <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-8 text-center max-w-2xl">
-                    Objevte inspiraci na chutná jídla, která si můžete připravit kdykoliv. Procházejte recepty,
-                    vybírejte
-                    oblíbené a užijte si vaření!
-                </p>
-            </div>
-            <div>
-                <h2 className="text-base text-center md:text-lg md:text-start lg:text-2xl mt-5 mb-5 border-b-2 border-gray-500">Doporučujeme </h2>
-
-                {/*//zde potřebuju zobrazit recepty které mají hodnocení vyšší jak 4*/}
-
-                <Recipes recipes={recipes} filter={filter}/>
-            </div>
-
-            <div>
-                <h2 className="text-base text-center md:text-lg md:text-start lg:text-2xl mt-10 mb-5 border-b-2 border-gray-500">
-                    Rady a typy pro snadné vaření
-                </h2>
-                <Articles />
-            </div>
-
-        </div>
-    );
-}
+            </>
+            );
+            }

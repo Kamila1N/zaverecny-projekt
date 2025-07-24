@@ -10,6 +10,7 @@ export function RecipesList() {
     const showFavoritePage = filter === "favorite";
     const [recipes, setRecipes] = useState([]);
 
+
     const fetchRecipes = useCallback(async () => {
         try {
             let query = supabase.from('recipes').select('*');
@@ -18,20 +19,19 @@ export function RecipesList() {
             }
             const { data, error } = await query;
             if (error) {
-                console.error("Chyba při načítání receptů:", error);
+
             } else {
                 setRecipes(data);
                 console.table("Načtené recepty:", data);
             }
         } catch (error) {
-            console.error("Error fetching recipes:", error);
+
         }
     }, [showFavoritePage]);
 
     useEffect(() => {
         fetchRecipes();
     }, [fetchRecipes]);
-
 
 
     return (
