@@ -5,8 +5,12 @@ import searchIcon from '../../assets/loupe.png'
 import heartIcon from '../../assets/heart.png'
 import heartBlackIcon from '../../assets/heart-black.png'
 import {NavLink} from "react-router-dom";
+import {useLocation} from "react-router-dom";
 
 export function Header() {
+
+    const location = useLocation();
+    const isFavoritePage = location.pathname.includes('/recipes-list/favorite');
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState("");
 
@@ -39,9 +43,14 @@ export function Header() {
                     <NavLink className="text-black font-medium px-5 py-2 hover:text-teal-600"
                        to="/recipes-list">Recepty</NavLink>
                     <NavLink className="text-black font-medium px-5 py-2 flex items-center gap-2 hover:text-teal-600"
-                       to={"/favorite"}>
-                        <span className="hidden md:inline">Oblíbené</span>
-                        <img src={heartBlackIcon} alt="favorite" className="w-7 h-7"/></NavLink>
+                             to={"/recipes-list/favorite"}>
+                        {/*<span className="hidden md:inline">Oblíbené</span>*/}
+                        <img
+                            src={isFavoritePage ? heartIcon : heartBlackIcon}
+                            alt="favorite"
+                            className={`w-7 h-7 ${isFavoritePage ? "filter-red" : ""}`}
+                        />
+                    </NavLink>
 
                 </nav>
             </div>

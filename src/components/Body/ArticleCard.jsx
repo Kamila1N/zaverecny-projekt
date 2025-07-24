@@ -9,7 +9,7 @@ function getShortText(text, maxLength) {
 
 export function ArticleCard({ article }) {
     const [showMore, setShowMore] = useState(false);
-    const maxLength = 100;
+    const maxLength = 80;
     const isLong = article.content.length > maxLength;
     const displayContent = showMore
         ? article.content

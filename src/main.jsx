@@ -18,6 +18,7 @@ createRoot(document.getElementById('root')).render(
                 <Route path="/" element={<App/>}>
                     <Route index element={<HomePage/>}/>
                     <Route path="recipes-list" element={<RecipesList />} />
+                    <Route path="recipes-list/:filter" element={<RecipesList />} />
 
                 </Route>
 

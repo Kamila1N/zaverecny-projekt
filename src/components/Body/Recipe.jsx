@@ -1,4 +1,7 @@
 import * as React from 'react';
+import { useState } from 'react';
+import { supabase } from '../../supabase.js';
+import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import AspectRatio from '@mui/joy/AspectRatio';
 import Rating from '@mui/material/Rating';
 import Stack from '@mui/material/Stack';
@@ -10,20 +13,17 @@ import Link from '@mui/joy/Link';
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
 
 
-export function Recipe({ recept}) {
+export function Recipe({ recept }) {
 
-    // function renderRating(rating, maxRating = 5) {
-    //     const stars = [];
-    //     for (let i = 0; i < maxRating; i++) {
-    //         stars.push(
-    //             <span key={i} style={{color: '#FFD700', fontSize: '1.2em'}}>
-    //             {i <= Math.round(rating) ? '★' : '☆'}
-    //         </span>
-    //         );
-    //     }
-    //     return stars;
-    // }
+    const [favorite, setFavorite] = useState(recept.favorite);
 
+    const handleFavoriteClick = async () => {
+        const newFavoriteStatus = !favorite;
+        setFavorite(newFavoriteStatus);
+        await supabase.from("recipes")
+            .update({ favorite: newFavoriteStatus })
+            .eq('id', recept.id);
+    }
 
     return (
         <Card
@@ -42,7 +42,7 @@ export function Recipe({ recept}) {
             }}
         >
             <AspectRatio variant="soft" sx={{ width: '100%' }}>
-                <img src={recept.img} loading="lazy" alt={recept.title} />
+                <img src={recept.image} loading="lazy" alt={recept.title} />
             </AspectRatio>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
                 <Typography level="title-lg">
@@ -50,14 +50,15 @@ export function Recipe({ recept}) {
                         {recept.title}
                     </Link>
                 </Typography>
-                <IconButton size="sm" variant="plain" color="neutral">
-                    <FavoriteBorderRoundedIcon color="danger" />
+                <IconButton size="sm" variant="plain" color="neutral" onClick={handleFavoriteClick}>
+                    {favorite ? ( <FavoriteRoundedIcon sx={{ color: 'red' }} />):(<FavoriteBorderRoundedIcon />) }
+
                 </IconButton>
             </Box>
             <Stack spacing={1}>
                 <Rating name="half-rating-read" defaultValue={recept.rating} precision={0.5} readOnly />
             </Stack>
-            {/*<Box>{renderRating(recept.rating)}</Box>*/}
+
             <Typography level="body-sm">{recept.time}</Typography>
             <Box sx={{ display: 'flex', gap: 1.5, mt: 'auto' }}></Box>
         </Card>

@@ -12,6 +12,7 @@ import jidlo3 from "../../assets/jidlo3.jpg";
 import jidlo4 from "../../assets/jidlo4.jpg";
 import jidlo5 from "../../assets/jidlo5.jpg";
 import jidlo6 from "../../assets/jidlo6.jpg";
+import rating from "daisyui/components/rating/index.js";
 
 const images = [jidlo1, jidlo2,jidlo3, jidlo4, jidlo5, jidlo6
 ];
@@ -92,7 +93,7 @@ export function HomePage() {
 
                 {/*//zde potřebuju zobrazit recepty které mají hodnocení vyšší jak 4*/}
 
-                <Recipes/>
+                <Recipes filter={{rating: 4}}/>
             </div>
 
             <div>
