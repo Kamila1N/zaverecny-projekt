@@ -2,6 +2,7 @@ import {Recipes} from "./Recipes.jsx";
 import {useEffect, useState} from "react";
 import {supabase} from "../../supabase.js";
 import {useParams} from "react-router-dom";
+import {useCallback} from "react";
 
 export function RecipesList() {
 
@@ -9,26 +10,27 @@ export function RecipesList() {
     const showFavoritePage = filter === "favorite";
     const [recipes, setRecipes] = useState([]);
 
-    useEffect(() => {
-        const fetchRecipes = async () => {
-            try {
-                let query = supabase.from('recipes').select('*');
-                if (showFavoritePage) {
-                    query = query.eq('favorite', true);
-                }
-                const { data, error } = await query;
-                if (error) {
-                    console.error("Chyba při načítání receptů:", error);
-                } else {
-                    setRecipes(data);
-                    console.table("Načtené recepty:", data);
-                }
-            } catch (error) {
-                console.error("Error fetching recipes:", error);
+    const fetchRecipes = useCallback(async () => {
+        try {
+            let query = supabase.from('recipes').select('*');
+            if (showFavoritePage) {
+                query = query.eq('favorite', true);
             }
-        };
+            const { data, error } = await query;
+            if (error) {
+                console.error("Chyba při načítání receptů:", error);
+            } else {
+                setRecipes(data);
+                console.table("Načtené recepty:", data);
+            }
+        } catch (error) {
+            console.error("Error fetching recipes:", error);
+        }
+    }, [showFavoritePage]);
+
+    useEffect(() => {
         fetchRecipes();
-    }, [filter]);
+    }, [fetchRecipes]);
 
 
 
@@ -39,7 +41,7 @@ export function RecipesList() {
                 <h2 className="text-base text-center md:text-lg md:text-start lg:text-2xl mt-5 mb-5 border-b-2 border-gray-500">
                     {showFavoritePage ? "Oblíbené recepty" : "Všechny recepty"} </h2>
 
-            <Recipes recipes={recipes}/>
+            <Recipes recipes={recipes} onFavoriteChange={fetchRecipes} />
 
             </div>
         </>

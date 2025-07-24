@@ -51,7 +51,7 @@ import {Recipe} from './Recipe';
 //     }
 // ];
 
-export function Recipes({recipes, filter}) {
+export function Recipes({recipes, filter, onFavoriteChange}) {
 
     const filteredRecipes = filter?.rating
         ? recipes.filter(r => r.rating >= filter.rating)
@@ -67,7 +67,7 @@ export function Recipes({recipes, filter}) {
             justifyItems: 'center'
                         }}>
             {filteredRecipes.map(recept => (
-                <Recipe key={recept.id} recept={recept} />
+                <Recipe key={recept.id} recept={recept} onFavoriteChange={onFavoriteChange}  />
             ))}
 
         </Box>

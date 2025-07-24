@@ -13,7 +13,7 @@ import Link from '@mui/joy/Link';
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
 
 
-export function Recipe({ recept }) {
+export function Recipe({ recept, onFavoriteChange }) {
 
     const [favorite, setFavorite] = useState(recept.favorite);
 
@@ -23,6 +23,9 @@ export function Recipe({ recept }) {
         await supabase.from("recipes")
             .update({ favorite: newFavoriteStatus })
             .eq('id', recept.id);
+        if (onFavoriteChange){
+            onFavoriteChange();
+        }
     }
 
     return (
