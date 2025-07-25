@@ -21,6 +21,23 @@ export function HomePage() {
     const [recipes, setRecipes] = useState([]);
     const [current, setCurrent] = useState(0);
     const intervalRef = useRef(null);
+    // stránkování pro doporučené recepty
+    const [recommendedPage, setRecommendedPage] = useState(1);
+    const [recommendedPerPage, setRecommendedPerPage] = useState(10);
+
+    // Dynamická změna počtu doporučených na stránku podle šířky okna
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth < 560) setRecommendedPerPage(2)
+            else if (window.innerWidth < 874) setRecommendedPerPage(4)
+            else if (window.innerWidth < 1222) setRecommendedPerPage(6)
+            else if (window.innerWidth < 1488) setRecommendedPerPage(8)
+            else setRecommendedPerPage(10);
+        };
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     useEffect(() => {
        startAutoSlide();
@@ -36,6 +53,12 @@ export function HomePage() {
     }, []);
 
     const filter = {rating: 4}
+
+    // vyfiltrované doporučené recepty
+    const recommendedRecipes = recipes.filter(r => r.rating >= filter.rating);
+    const totalRecommendedPages = Math.ceil(recommendedRecipes.length / recommendedPerPage);
+    const paginatedRecommended = recommendedRecipes.slice((recommendedPage - 1) * recommendedPerPage, recommendedPage * recommendedPerPage);
+
 
     const startAutoSlide = () => {
         clearInterval(intervalRef.current);
@@ -54,6 +77,9 @@ export function HomePage() {
         setCurrent((current + 1) % images.length);
         startAutoSlide();
     }
+
+    //funkce na stránkování receptů
+
 
     return (
         <>
@@ -108,22 +134,20 @@ export function HomePage() {
                         <h2 className="font-bold text-teal-800 flex items-center gap-2 text-2xl text-center md:text-start mt-10 mb-10 pl-5 border-b-2 border-teal-600">
                             Doporučujeme </h2>
 
-
-                        {/*//zde potřebuju zobrazit recepty které mají hodnocení vyšší jak 4*/}
-
-                        <Recipes recipes={recipes} filter={filter}/>
-
+                        {/* stránkování pro doporučené recepty */}
+                        <Recipes recipes={paginatedRecommended} />
+                        {totalRecommendedPages > 1 && (
+                            <div className="flex justify-center gap-2 mt-8">
+                                <button onClick={() => setRecommendedPage(recommendedPage - 1)} disabled={recommendedPage === 1} className="px-3 py-1 rounded bg-teal-600 text-white disabled:bg-gray-300">Předchozí</button>
+                                <span className="px-2 py-1">Strana {recommendedPage} z {totalRecommendedPages}</span>
+                                <button onClick={() => setRecommendedPage(recommendedPage + 1)} disabled={recommendedPage === totalRecommendedPages} className="px-3 py-1 rounded bg-teal-600 text-white disabled:bg-gray-300">Další</button>
+                            </div>
+                        )}
                     </div>
                     <div>
                         <h2 className="font-bold text-gray-700 flex items-center gap-2 text-2xl text-center md:text-start mt-20 border-b-2 pl-5 border-zinc-600">
                             Rady a typy pro snadné vaření
                         </h2>
-                        {/*<div*/}
-                        {/*    className="bg-teal-50  border-teal-600 p-4 rounded-md shadow text-base text-center md:text-lg md:text-start lg:text-2xl mt-10 mb-5">*/}
-                        {/*        <h2 className="text-xl font-bold text-teal-700 flex items-center gap-2">*/}
-                        {/*            <i className="fas fa-info-circle text-blue-500"></i>*/}
-                        {/*            Rady a tipy pro snadné vaření*/}
-                        {/*        </h2>*/}
 
                         <Articles/>
                     </div>

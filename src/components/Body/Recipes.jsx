@@ -2,13 +2,8 @@ import * as React from 'react';
 import Box from '@mui/joy/Box';
 import {Recipe} from './Recipe';
 
-export function Recipes({recipes, filter, onFavoriteChange}) {
 
-    const filteredRecipes = filter?.rating
-        ? recipes.filter(r => r.rating >= filter.rating)
-        : recipes;
-
-
+export function Recipes({recipes, onFavoriteChange}) {
     return (
         <Box sx={{
             display: 'grid',
@@ -16,9 +11,9 @@ export function Recipes({recipes, filter, onFavoriteChange}) {
             gap: 2,
             minHeight: 250,
             justifyItems: 'center'
-                        }}>
-            {filteredRecipes.map(recept => (
-                <Recipe key={recept.id} recept={recept} onFavoriteChange={onFavoriteChange}  />
+        }}>
+            {recipes.map(recept => (
+                <Recipe key={recept.id} recept={recept} onFavoriteChange={onFavoriteChange} />
             ))}
 
         </Box>
