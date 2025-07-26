@@ -15,6 +15,7 @@ import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded
 
 export function Recipe({ recept, onFavoriteChange }) {
 
+    //nastavení oblíbeného receptu
     const [favorite, setFavorite] = useState(recept.favorite);
 
     const handleFavoriteClick = async () => {
@@ -45,15 +46,15 @@ export function Recipe({ recept, onFavoriteChange }) {
             }}
         >
             <AspectRatio variant="soft" sx={{ width: '100%' }}>
-                <img src={recept.image} loading="lazy" alt={recept.title} />
+                <img src={recept.image} loading="lazy" alt={recept.title} style={{cursor: 'pointer'}}/>
             </AspectRatio>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-                <Typography level="title-lg">
-                    <Link href="#" overlay underline="none">
+                <a href={`/recept/${recept.id}`} style={{ textDecoration: 'none', color: 'inherit', flex: 1 }} onClick={e => e.stopPropagation()}>
+                    <Typography level="title-lg" sx={{ cursor: 'pointer' }}>
                         {recept.title}
-                    </Link>
-                </Typography>
-                <IconButton size="sm" variant="plain" color="neutral" onClick={handleFavoriteClick}>
+                    </Typography>
+                </a>
+                <IconButton size="sm" variant="plain" color="neutral" onClick={e => { e.stopPropagation(); handleFavoriteClick(); }}>
                     {favorite ? ( <FavoriteRoundedIcon sx={{ color: 'red' }} />):(<FavoriteBorderRoundedIcon />) }
 
                 </IconButton>

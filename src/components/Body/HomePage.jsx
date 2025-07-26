@@ -1,7 +1,8 @@
-import {useEffect, useState,useRef} from "react";
+import {useEffect, useState, useRef} from "react";
 import {Recipes} from "./Recipes.jsx";
 import {supabase} from "../../supabase.js";
 import {Articles} from "./Articles.jsx";
+import {useLocation} from "react-router-dom";
 
 import prava from "../../assets/prava.png";
 import leva from "../../assets/leva.png";
@@ -24,6 +25,8 @@ export function HomePage() {
     // stránkování pro doporučené recepty
     const [recommendedPage, setRecommendedPage] = useState(1);
     const [recommendedPerPage, setRecommendedPerPage] = useState(10);
+    const location = useLocation();
+    const searchTerm = new URLSearchParams(location.search).get('search')?.toLowerCase() || "";
 
     // Dynamická změna počtu doporučených na stránku podle šířky okna
     useEffect(() => {
@@ -54,8 +57,24 @@ export function HomePage() {
 
     const filter = {rating: 4}
 
-    // vyfiltrované doporučené recepty
-    const recommendedRecipes = recipes.filter(r => r.rating >= filter.rating);
+    // vyfiltrované doporučené recepty podle hodnocení a případně hledání
+    const recommendedRecipes = recipes.filter(r => {
+        if (r.rating < filter.rating) return false;
+        if (!searchTerm) return true;
+        const title = r.title?.toLowerCase() || "";
+        const description = r.description?.toLowerCase() || "";
+        const ingredients = Array.isArray(r.ingredients)
+            ? r.ingredients.map(i => (typeof i === 'string' ? i : i.name)).join(' ').toLowerCase()
+            : (r.ingredients || "").toLowerCase();
+        return (
+            title.includes(searchTerm) ||
+            description.includes(searchTerm) ||
+            ingredients.includes(searchTerm)
+        );
+    })
+    .map(r => ({
+        ...r
+    }));
     const totalRecommendedPages = Math.ceil(recommendedRecipes.length / recommendedPerPage);
     const paginatedRecommended = recommendedRecipes.slice((recommendedPage - 1) * recommendedPerPage, recommendedPage * recommendedPerPage);
 

@@ -1,9 +1,12 @@
 import * as React from 'react';
 import Box from '@mui/joy/Box';
 import {Recipe} from './Recipe';
+import {useNavigate} from 'react-router-dom';
 
 
 export function Recipes({recipes, onFavoriteChange}) {
+    const navigate = useNavigate();
+    const location = window.location;
     return (
         <Box sx={{
             display: 'grid',
@@ -13,7 +16,15 @@ export function Recipes({recipes, onFavoriteChange}) {
             justifyItems: 'center'
         }}>
             {recipes.map(recept => (
-                <Recipe key={recept.id} recept={recept} onFavoriteChange={onFavoriteChange} />
+                <div key={recept.id} style={{width: '100%'}}
+                     onClick={() => navigate(`/recept/${recept.id}?backTo=${encodeURIComponent(location.pathname + location.search)}`)}>
+                    <Recipe
+                        recept={recept}
+                        onFavoriteChange={onFavoriteChange}
+                        highlight={recept.highlight}
+                        searchTerm={recept.searchTerm}
+                    />
+                </div>
             ))}
 
         </Box>
