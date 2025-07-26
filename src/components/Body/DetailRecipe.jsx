@@ -69,7 +69,7 @@ export function DetailRecipe() {
     return (
         <div className="bg-white ">
             <div
-                className="pt-32 max-w-4xl md:pt-40 lg:pt-32 bg-gradient-to-b from-gray-200 to-teal-50 mx-auto px-4 md:px-8 pb-10 min-h-screen rounded-xl shadow-lg mt-10">
+                className="pt-38 max-w-4xl md:pt-[230px] lg:pt-[180px] md:pt-40 xl:pt-40 bg-gradient-to-b from-gray-200 to-teal-50 mx-auto px-4 md:px-8 pb-10 min-h-screen rounded-xl shadow-lg mt-10">
                 <button
                     onClick={handleBack}
                     className="mb-6 flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white mt-4 px-4 py-1.5 rounded-lg font-semibold shadow transition text-sm"
@@ -129,8 +129,8 @@ export function DetailRecipe() {
                         </ul>
                     </div>
                     <div>
-                        <h2 className="text-xl font-bold mt-10 mb-2">Postup:</h2>
-                        <div className="p-2 text-gray-700 whitespace-pre-line text-sm bg-white rounded shadow-sm">
+                        <h2 className="text-2xl font-bold mt-10 mb-2">Postup:</h2>
+                        <div className="p-2 text-gray-700 whitespace-pre-line text-md bg-white rounded shadow-sm">
                             {recept.description}
                         </div>
                     </div>

@@ -54,13 +54,9 @@ export function RecipesList() {
         if (!searchTerm) return true;
         const title = recipe.title?.toLowerCase() || "";
         const description = recipe.description?.toLowerCase() || "";
-        // const ingredients = Array.isArray(recipe.ingredients)
-        //     ? recipe.ingredients.map(i => (typeof i === 'string' ? i : i.name)).join(' ').toLowerCase()
-        //     : (recipe.ingredients || "").toLowerCase();
         return (
             title.includes(searchTerm) ||
             description.includes(searchTerm)
-            // ingredients.includes(searchTerm)
         );
     });
 
