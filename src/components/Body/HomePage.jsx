@@ -22,20 +22,22 @@ export function HomePage() {
     const [recipes, setRecipes] = useState([]);
     const [current, setCurrent] = useState(0);
     const intervalRef = useRef(null);
-    // stránkování pro doporučené recepty
     const [recommendedPage, setRecommendedPage] = useState(1);
     const [recommendedPerPage, setRecommendedPerPage] = useState(10);
+    const [recommendedTotalCount, setRecommendedTotalCount] = useState(0);
     const location = useLocation();
     const searchTerm = new URLSearchParams(location.search).get('search')?.toLowerCase() || "";
 
-    // Dynamická změna počtu doporučených na stránku podle šířky okna
     useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth < 560) setRecommendedPerPage(2)
-            else if (window.innerWidth < 874) setRecommendedPerPage(4)
-            else if (window.innerWidth < 1222) setRecommendedPerPage(6)
-            else if (window.innerWidth < 1488) setRecommendedPerPage(8)
-            else setRecommendedPerPage(10);
+            let newPerPage;
+            if (window.innerWidth < 560) newPerPage = 2;
+            else if (window.innerWidth < 874) newPerPage = 4;
+            else if (window.innerWidth < 1222) newPerPage = 6;
+            else if (window.innerWidth < 1488) newPerPage = 8;
+            else newPerPage = 10;
+            setRecommendedPerPage(newPerPage);
+            setRecommendedPage(1); // reset na první stránku při změně velikosti okna
         };
         handleResize();
         window.addEventListener("resize", handleResize);
@@ -48,35 +50,31 @@ export function HomePage() {
     })
 
     useEffect(() => {
-        const fetchRecipes = async () => {
-            const { data, error } = await supabase.from("recipes").select("*");
-            if (!error) setRecipes(data);
+        const fetchRecommendedRecipes = async () => {
+            // Získat pouze nejnovějších 10 receptů s rating >= 4
+            let query = supabase.from("recipes").select("*", { count: "exact" }).order("created_at", { ascending: false }).gte('rating', 4).limit(10);
+            if (searchTerm) {
+                query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+            }
+            const { data, error, count } = await query;
+            if (!error) {
+                setRecipes(data);
+                if (typeof count === 'number') setRecommendedTotalCount(Math.min(count, 10));
+            }
         };
-        fetchRecipes();
-    }, []);
+        fetchRecommendedRecipes();
+    }, [recommendedPerPage, searchTerm]);
 
-    const filter = {rating: 4}
+    // stránkování doporučených receptů
+    const totalRecommendedPages = Math.ceil(recommendedTotalCount / recommendedPerPage);
+    const paginatedRecommended = recipes.slice((recommendedPage - 1) * recommendedPerPage, recommendedPage * recommendedPerPage);
 
-    // vyfiltrované doporučené recepty podle hodnocení a případně hledání
-    const recommendedRecipes = recipes.filter(r => {
-        if (r.rating < filter.rating) return false;
-        if (!searchTerm) return true;
-        const title = r.title?.toLowerCase() || "";
-        const description = r.description?.toLowerCase() || "";
-        const ingredients = Array.isArray(r.ingredients)
-            ? r.ingredients.map(i => (typeof i === 'string' ? i : i.name)).join(' ').toLowerCase()
-            : (r.ingredients || "").toLowerCase();
-        return (
-            title.includes(searchTerm) ||
-            description.includes(searchTerm) ||
-            ingredients.includes(searchTerm)
-        );
-    })
-    .map(r => ({
-        ...r
-    }));
-    const totalRecommendedPages = Math.ceil(recommendedRecipes.length / recommendedPerPage);
-    const paginatedRecommended = recommendedRecipes.slice((recommendedPage - 1) * recommendedPerPage, recommendedPage * recommendedPerPage);
+    useEffect(() => {
+        // Pokud je aktuální stránka mimo rozsah po změně počtu na stránku, reset na první stránku
+        if ((recommendedPage - 1) * recommendedPerPage >= recommendedTotalCount) {
+            setRecommendedPage(1);
+        }
+    }, [recommendedPerPage, recommendedTotalCount]);
 
 
     const startAutoSlide = () => {
@@ -97,8 +95,11 @@ export function HomePage() {
         startAutoSlide();
     }
 
-    //funkce na stránkování receptů
-
+    const handleRecommendedPageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalRecommendedPages) {
+            setRecommendedPage(newPage);
+        }
+    };
 
     return (
         <>

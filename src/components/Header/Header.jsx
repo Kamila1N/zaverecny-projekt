@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import React from "react";
 import './Header.scss'
 import logo from '../../assets/logo.jpg'
@@ -15,7 +15,7 @@ export function Header() {
     const navigate = useNavigate();
 
     // Při změně stránky nastav input podle query parametru
-    React.useEffect(() => {
+    useEffect(() => {
         // Pokud jsem na detailu receptu, input bude vždy prázdný
         if (location.pathname.startsWith('/recept/')) {
             setSearch("");

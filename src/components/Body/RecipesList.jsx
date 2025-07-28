@@ -15,17 +15,41 @@ export function RecipesList() {
     const [recipes, setRecipes] = useState([]);
     const [page, setPage] = useState(1);
     const [recipesPerPage, setRecipesPerPage] = useState(15);
+    const [totalCount, setTotalCount] = useState(0);
     const query = useQuery();
     const searchTerm = query.get('search')?.toLowerCase() || "";
 
-    // Dynamická změna počtu receptů na stránku podle velikosti okna
+    const fetchRecipes = useCallback(async (pageToLoad = page, perPageToLoad = recipesPerPage) => {
+        const from = (pageToLoad - 1) * perPageToLoad;
+        const to = from + perPageToLoad - 1;
+        let query = supabase.from('recipes').select('*', { count: 'exact' }).order('id').range(from, to);
+        if (showFavoritePage) {
+            query = query.eq('favorite', true);
+        }
+        if (searchTerm) {
+            query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+        }
+        const { data, error, count } = await query;
+        if (!error) {
+            setRecipes(data);
+            if (typeof count === 'number') setTotalCount(count);
+        }
+    }, [showFavoritePage, searchTerm, page, recipesPerPage]);
+
+    useEffect(() => {
+        fetchRecipes(page, recipesPerPage);
+    }, [fetchRecipes, page, recipesPerPage]);
+
     useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth < 560) setRecipesPerPage(3)
-            else if (window.innerWidth < 874) setRecipesPerPage(6)
-            else if (window.innerWidth < 1222) setRecipesPerPage(9)
-            else if (window.innerWidth < 1488) setRecipesPerPage(12)
-            else setRecipesPerPage(15);
+            let newPerPage;
+            if (window.innerWidth < 560) newPerPage = 3;
+            else if (window.innerWidth < 874) newPerPage = 6;
+            else if (window.innerWidth < 1222) newPerPage = 9;
+            else if (window.innerWidth < 1488) newPerPage = 12;
+            else newPerPage = 15;
+            setRecipesPerPage(newPerPage);
+            setPage(1); // reset na první stránku při změně velikosti okna
         };
         handleResize();
         window.addEventListener("resize", handleResize);
@@ -34,35 +58,8 @@ export function RecipesList() {
         };
     }, []);
 
-    const fetchRecipes = useCallback(async () => {
-        let query = supabase.from('recipes').select('*').order('id');
-        if (showFavoritePage) {
-            query = query.eq('favorite', true);
-        }
-        const { data, error } = await query;
-        if (!error) {
-            setRecipes(data);
-        }
-    }, [showFavoritePage]);
-
-    useEffect(() => {
-        fetchRecipes();
-    }, [fetchRecipes]);
-
-//filtrování receptů podle vyhledávacího výrazu
-    const filteredRecipes = recipes.filter(recipe => {
-        if (!searchTerm) return true;
-        const title = recipe.title?.toLowerCase() || "";
-        const description = recipe.description?.toLowerCase() || "";
-        return (
-            title.includes(searchTerm) ||
-            description.includes(searchTerm)
-        );
-    });
-
-    // stránkování
-    const totalPages = Math.ceil(filteredRecipes.length / recipesPerPage);
-    const paginatedRecipes = filteredRecipes.slice((page - 1) * recipesPerPage, page * recipesPerPage);
+    const totalPages = Math.ceil(totalCount / recipesPerPage);
+    const paginatedRecipes = recipes;
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
