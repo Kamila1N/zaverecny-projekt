@@ -8,6 +8,7 @@ import {RecipesList} from "./components/Body/RecipesList.jsx";
 import {DetailRecipe} from "./components/Body/DetailRecipe.jsx";
 
 import {BrowserRouter, Route, Routes} from "react-router-dom";
+import {AddRecipes} from "./components/Body/AddRecipes.jsx";
 
 
 
@@ -20,6 +21,7 @@ createRoot(document.getElementById('root')).render(
                     <Route index element={<HomePage/>}/>
                     <Route path="recipes-list" element={<RecipesList />} />
                     <Route path="recipes-list/:filter" element={<RecipesList />} />
+                    <Route path="newRecipes" element={<AddRecipes />} />
                     <Route path="recept/:id" element={<DetailRecipe />} />
 
                 </Route>

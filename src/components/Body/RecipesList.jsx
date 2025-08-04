@@ -22,7 +22,8 @@ export function RecipesList() {
     const fetchRecipes = useCallback(async (pageToLoad = page, perPageToLoad = recipesPerPage) => {
         const from = (pageToLoad - 1) * perPageToLoad;
         const to = from + perPageToLoad - 1;
-        let query = supabase.from('recipes').select('*', { count: 'exact' }).order('id').range(from, to);
+        let query = supabase.from('recipes')
+            .select('*', { count: 'exact' }).order('id').range(from, to);
         if (showFavoritePage) {
             query = query.eq('favorite', true);
         }

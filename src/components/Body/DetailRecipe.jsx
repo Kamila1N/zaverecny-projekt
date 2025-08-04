@@ -3,6 +3,7 @@ import {useParams, useNavigate, useLocation} from "react-router-dom";
 import {supabase} from "../../supabase.js";
 import Rating from "@mui/material/Rating";
 import * as React from "react";
+import Modal from "@mui/material/Modal";
 
 export function DetailRecipe() {
     const { id } = useParams();
@@ -12,7 +13,11 @@ export function DetailRecipe() {
     const location = useLocation();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [editMode, setEditMode] = useState(false);
+    const [editData, setEditData] = useState(null);
+    const [modalOpen, setModalOpen] = useState(false);
 
+    // Načtení receptu podle ID z URL
     useEffect(() => {
         const fetchRecipe = async () => {
             setLoading(true);
@@ -52,8 +57,70 @@ export function DetailRecipe() {
         }
     };
 
+    // Funkce pro otevření editace
     const handleEdit = () => {
-        navigate(`/edit-recept/${id}`);
+        setEditData({
+            ...recept,
+            ingredients: Array.isArray(recept.ingredients) ? recept.ingredients : []
+        });
+        setEditMode(true);
+        setModalOpen(true);
+    };
+
+    // Funkce pro změnu hodnot ve formuláři
+    const handleEditChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setEditData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
+
+    // Funkce pro změnu ingrediencí
+    const handleIngredientChange = (idx, field, value) => {
+        setEditData(prev => ({
+            ...prev,
+            ingredients: prev.ingredients.map((ing, i) =>
+                i === idx ? { ...ing, [field]: value } : ing
+            )
+        }));
+    };
+
+    // Přidání nové ingredience
+    const handleAddIngredient = () => {
+        setEditData(prev => ({
+            ...prev,
+            ingredients: [...(prev.ingredients || []), { name: '', amount: '' }]
+        }));
+    };
+
+    // Odebrání ingredience
+    const handleRemoveIngredient = (idx) => {
+        setEditData(prev => ({
+            ...prev,
+            ingredients: prev.ingredients.filter((_, i) => i !== idx)
+        }));
+    };
+
+    // Uložení změn
+    const handleSaveEdit = async (e) => {
+        e.preventDefault();
+        if (!window.confirm('Opravdu chcete uložit změny v receptu?')) return;
+        setLoading(true);
+        const { error } = await supabase.from('recipes').update(editData).eq('id', id);
+        setLoading(false);
+        if (!error) {
+            setRecept(editData);
+            setEditMode(false);
+            setModalOpen(false);
+        } else {
+            setError('Chyba při ukládání změn.');
+        }
+    };
+
+    const handleCloseModal = () => {
+        setEditMode(false);
+        setModalOpen(false);
     };
 
     const handleBack = () => {
@@ -91,7 +158,8 @@ export function DetailRecipe() {
                      className="w-full max-h-60 object-cover rounded-lg mb-3 mx-auto shadow"/>
                 <div className="flex gap-2 mb-4 justify-center">
                     <button onClick={handleEdit}
-                            className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded font-semibold text-md">Editovat
+                            className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded font-semibold text-md">
+                        Editovat
                     </button>
                     <button onClick={handleDelete}
                             className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded font-semibold text-md">Smazat
@@ -113,6 +181,13 @@ export function DetailRecipe() {
                         </svg>
                     )}
                 </div>
+                {recept.time && (
+                    <div className="flex justify-center mt-2 mb-2">
+                        <span className="inline-block bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm font-semibold">
+                            Čas přípravy: {recept.time}
+                        </span>
+                    </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
 
@@ -135,6 +210,69 @@ export function DetailRecipe() {
                         </div>
                     </div>
                 </div>
+                <Modal open={modalOpen} onClose={handleCloseModal}>
+                    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40">
+                        <div className="bg-white p-4 md:p-8 rounded shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto relative">
+                            <button onClick={handleCloseModal} className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
+                            {editData && (
+                            <form onSubmit={handleSaveEdit} className="space-y-4">
+                                <h2 className="text-2xl font-bold mb-4">Editace receptu</h2>
+                                <div>
+                                    <label className="block font-semibold">Název:</label>
+                                    <input name="title" value={editData.title || ''} onChange={handleEditChange} className="w-full border rounded p-2" required />
+                                </div>
+                                <div>
+                                    <label className="block font-semibold">Obrázek (URL):</label>
+                                    <input name="image" type="text" value={editData.image || ''} onChange={handleEditChange} className="w-full border rounded p-2" />
+                                </div>
+                                <div>
+                                    <label className="block font-semibold">Popis (description):</label>
+                                    <textarea name="description" value={editData.description || ''} onChange={handleEditChange} className="w-full border rounded p-2" rows={4} />
+                                </div>
+                                <div>
+                                    <label className="block font-semibold">Ingredience:</label>
+                                    {editData.ingredients && editData.ingredients.map((ing, idx) => (
+                                        <div key={idx} className="flex gap-2 mb-2">
+                                            <input
+                                                type="text"
+                                                placeholder="Množství"
+                                                value={ing.amount || ''}
+                                                onChange={e => handleIngredientChange(idx, 'amount', e.target.value)}
+                                                className="border rounded p-1 w-1/4"
+                                            />
+                                            <input
+                                                type="text"
+                                                placeholder="Název"
+                                                value={ing.name || ''}
+                                                onChange={e => handleIngredientChange(idx, 'name', e.target.value)}
+                                                className="border rounded p-1 w-2/4"
+                                            />
+                                            <button type="button" onClick={() => handleRemoveIngredient(idx)} className="text-red-600">X</button>
+                                        </div>
+                                    ))}
+                                    <button type="button" onClick={handleAddIngredient} className="text-teal-600 underline">Přidat ingredienci</button>
+                                </div>
+                                <div>
+                                    <label className="block font-semibold">Hodnocení:</label>
+                                    <input name="rating" type="number" min="0" max="5" step="0.5" value={editData.rating || ''} onChange={handleEditChange} className="w-24 border rounded p-2" />
+                                </div>
+                                <div>
+                                    <label className="block font-semibold">Čas (libovolný text):</label>
+                                    <input name="time" type="text" value={editData.time || ''} onChange={handleEditChange} className="w-full border rounded p-2" />
+                                </div>
+                                <div>
+                                    <label className="block font-semibold">Oblíbený:</label>
+                                    <input name="favorite" type="checkbox" checked={!!editData.favorite} onChange={handleEditChange} className="ml-2" />
+                                </div>
+                                <div className="flex gap-2">
+                                    <button type="submit" className="px-4 py-2 bg-teal-600 text-white rounded">Uložit změny</button>
+                                    <button type="button" onClick={handleCloseModal} className="px-4 py-2 bg-gray-400 text-white rounded">Zrušit</button>
+                                </div>
+                            </form>
+                            )}
+                        </div>
+                    </div>
+                </Modal>
             </div>
         </div>
     );

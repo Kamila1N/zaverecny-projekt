@@ -52,7 +52,10 @@ export function HomePage() {
     useEffect(() => {
         const fetchRecommendedRecipes = async () => {
             // Získat pouze nejnovějších 10 receptů s rating >= 4
-            let query = supabase.from("recipes").select("*", { count: "exact" }).order("created_at", { ascending: false }).gte('rating', 4).limit(10);
+            let query = supabase.from("recipes")
+                .select("*", { count: "exact" })
+                .order("created_at", { ascending: false })
+                .gte('rating', 4).limit(10);
             if (searchTerm) {
                 query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
             }
@@ -104,7 +107,8 @@ export function HomePage() {
     return (
         <>
             <div className="bg-gradient-to-b from-teal-50 to-gray-100 ">
-                <div className="pt-[150px] md:pt-[210px] lg:pt-[150px] px-4 md:px-10 lg:px-20 max-w-[1600px] mx-auto pb-20 bg-white">
+                <div
+                    className="pt-[150px] md:pt-[210px] lg:pt-[150px] px-4 md:px-10 lg:px-20 max-w-[1600px] mx-auto pb-20 bg-white">
 
                     <div className="flex flex-col items-center mt-10">
                         <div
@@ -155,12 +159,27 @@ export function HomePage() {
                             Doporučujeme </h2>
 
                         {/* stránkování pro doporučené recepty */}
-                        <Recipes recipes={paginatedRecommended} />
+                        <Recipes recipes={paginatedRecommended}/>
                         {totalRecommendedPages > 1 && (
                             <div className="flex justify-center gap-2 mt-8">
-                                <button onClick={() => setRecommendedPage(recommendedPage - 1)} disabled={recommendedPage === 1} className="px-3 py-1 rounded bg-teal-600 text-white disabled:bg-gray-300">Předchozí</button>
-                                <span className="px-2 py-1">Strana {recommendedPage} z {totalRecommendedPages}</span>
-                                <button onClick={() => setRecommendedPage(recommendedPage + 1)} disabled={recommendedPage === totalRecommendedPages} className="px-3 py-1 rounded bg-teal-600 text-white disabled:bg-gray-300">Další</button>
+                                <button
+                                    onClick={() => handleRecommendedPageChange(recommendedPage - 1)}
+                                    disabled={recommendedPage === 1}
+                                    className="px-3 py-1 rounded bg-teal-600 text-white disabled:bg-gray-300"
+                                >
+                                    Předchozí
+                                </button>
+                                <span className="px-2 py-1">
+                Strana {recommendedPage} z {totalRecommendedPages}
+            </span>
+                                <button
+                                    onClick={() => handleRecommendedPageChange(recommendedPage + 1)}
+                                    disabled={recommendedPage === totalRecommendedPages}
+                                    className="px-3 py-1 rounded bg-teal-600 text-white disabled:bg-gray-300"
+                                >
+                                    Další
+                                </button>
+
                             </div>
                         )}
                     </div>
@@ -174,6 +193,6 @@ export function HomePage() {
                 </div>
             </div>
 
-            </>
-            );
-            }
+        </>
+    );
+}
