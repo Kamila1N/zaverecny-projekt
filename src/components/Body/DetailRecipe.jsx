@@ -34,6 +34,7 @@ export function DetailRecipe() {
     if (error) return <div className="pt-40 text-center text-red-600">{error}</div>;
     if (!recept) return null;
 
+    // Zpracování ingrediencí do pole textů
     let ingredients = [];
     if (Array.isArray(recept.ingredients)) {
         ingredients = recept.ingredients.map(
@@ -41,10 +42,12 @@ export function DetailRecipe() {
         );
     }
 
+    // Přepínání zaškrtnutí ingredience
     const handleCheck = idx => {
         setChecked(prev => prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]);
     };
 
+    // Smazání receptu
     const handleDelete = async () => {
         if (!window.confirm("Opravdu chcete tento recept smazat?")) return;
         setLoading(true);
@@ -118,18 +121,43 @@ export function DetailRecipe() {
         }
     };
 
+    // Zavření modálního okna
     const handleCloseModal = () => {
         setEditMode(false);
         setModalOpen(false);
     };
 
+    // Návrat zpět na předchozí stránku nebo na zadanou adresu
     const handleBack = () => {
-        // Pokud je v query parametru návratová adresa, použij ji, jinak použij history.back
         const backTo = new URLSearchParams(location.search).get('backTo');
         if (backTo) {
             navigate(backTo);
         } else {
             navigate(-1);
+        }
+    };
+  //nové hodnocení receptu a oblíbenosti, už by mělo fungovat bez přenáčítání stránky a měli by být ošetřeny i chyby
+    const handleRatingChange = async (_, newValue) => {
+        if (newValue !== null) {
+            const oldRating = recept.rating;
+            setRecept(prev => ({ ...prev, rating: newValue }));
+            const { error } = await supabase.from('recipes').update({ rating: newValue }).eq('id', id);
+            if (error) {
+                setRecept(prev => ({ ...prev, rating: oldRating }));
+                setError("Chyba při ukládání hodnocení.");
+            }
+        }
+    };
+
+    // Přepnutí oblíbenosti receptu
+    const handleFavoriteToggle = async (e) => {
+        e?.preventDefault?.();
+        const oldFavorite = recept.favorite;
+        setRecept(prev => ({ ...prev, favorite: !prev.favorite }));
+        const { error } = await supabase.from('recipes').update({ favorite: !recept.favorite }).eq('id', id);
+        if (error) {
+            setRecept(prev => ({ ...prev, favorite: oldFavorite }));
+            setError("Chyba při ukládání oblíbenosti.");
         }
     };
 
@@ -149,21 +177,12 @@ export function DetailRecipe() {
                 </button>
                 <h1 className="text-4xl font-bold text-gray-800 mb-3 text-center">{recept.title} </h1>
                 <div className="flex justify-center items-center mb-2 gap-2">
-                    {/*tady jsme udělala možnost přímé editace už v detailu, ještě přemýslím zda to tak udělat nebo ne*/}
-                    {/*<Rating name="half-rating-read" defaultValue={recept.rating} precision={0.5} readOn size="medium"/>*/}
                     <Rating
                         name="rating-detail"
                         value={Number(recept.rating) || 0}
                         precision={0.5}
                         max={5}
-                        onChange={async (_, newValue) => {
-                            if (newValue !== null) {
-                                setLoading(true);
-                                const {error} = await supabase.from('recipes').update({rating: newValue}).eq('id', id);
-                                setLoading(false);
-                                if (!error) setRecept(prev => ({...prev, rating: newValue}));
-                            }
-                        }}
+                        onChange={handleRatingChange}
                     />
 
                 </div>
@@ -181,18 +200,11 @@ export function DetailRecipe() {
                     {/* Velké srdíčko indikující oblíbenost receptu */}
                 </div>
                 <div className="flex justify-end mr-10">
-                    {/*přidano tlačíto na měnění stavu přímo na výpisu receptu ještě zvažuji zda nechat nebo ne*/}
                     <button
-                        onClick={async () => {
-                            const newFav = !recept.favorite;
-                            setLoading(true);
-                            const {error} = await supabase.from('recipes').update({favorite: newFav}).eq('id', recept.id);
-                            setLoading(false);
-                            if (!error) setRecept(prev => ({...prev, favorite: newFav}));
-                        }}
+                        type="button"
+                        onClick={handleFavoriteToggle}
                         className="focus:outline-none"
                         aria-label={recept.favorite ? "Odebrat z oblíbených" : "Přidat do oblíbených"}
-                        type="button"
                     >
                         {recept.favorite ? (
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-14 w-14 text-red-500"
