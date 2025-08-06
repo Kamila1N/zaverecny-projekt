@@ -7,6 +7,10 @@ import {useNavigate} from 'react-router-dom';
 export function Recipes({recipes, onFavoriteChange}) {
     const navigate = useNavigate();
     const location = window.location;
+    // Funkce pro zastavení propagace kliknutí z dětí (hvězdičky, srdíčko)
+    const stopPropagation = (e) => {
+        e.stopPropagation();
+    };
     return (
         <Box sx={{
             display: 'grid',
@@ -23,6 +27,7 @@ export function Recipes({recipes, onFavoriteChange}) {
                         onFavoriteChange={onFavoriteChange}
                         highlight={recept.highlight}
                         searchTerm={recept.searchTerm}
+                        stopPropagation={stopPropagation}
                     />
                 </div>
             ))}

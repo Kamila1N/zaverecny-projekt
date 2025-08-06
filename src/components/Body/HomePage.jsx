@@ -27,7 +27,7 @@ export function HomePage() {
     const [recommendedTotalCount, setRecommendedTotalCount] = useState(0);
     const location = useLocation();
     const searchTerm = new URLSearchParams(location.search).get('search')?.toLowerCase() || "";
-
+//zde řeším počet receptu podle velikosti okna
     useEffect(() => {
         const handleResize = () => {
             let newPerPage;
@@ -49,23 +49,26 @@ export function HomePage() {
        return () => {clearInterval(intervalRef.current);};
     })
 
+    // Funkce pro opětovné načtení doporučených receptů (předá se do Recipes) předtím se mi to
+    //nepřenačetlo samo, tak jsem, původně jsem totiž nemohla měnit hodnocení na kartičkách ale až u vnitř
+    // příjde mi toto s ohledem na funkčnost oblíbenosti vhodnější aby bylo možné měnit i hodnocení bez otevření detailu
+    const refreshRecommended = async () => {
+        let query = supabase.from("recipes")
+            .select("*", { count: "exact" })
+            .order("created_at", { ascending: false })
+            .gte('rating', 4).limit(10);
+        if (searchTerm) {
+            query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+        }
+        const { data, error, count } = await query;
+        if (!error) {
+            setRecipes(data);
+            if (typeof count === 'number') setRecommendedTotalCount(Math.min(count, 10));
+        }
+    };
+
     useEffect(() => {
-        const fetchRecommendedRecipes = async () => {
-            // Získat pouze nejnovějších 10 receptů s rating >= 4
-            let query = supabase.from("recipes")
-                .select("*", { count: "exact" })
-                .order("created_at", { ascending: false })
-                .gte('rating', 4).limit(10);
-            if (searchTerm) {
-                query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
-            }
-            const { data, error, count } = await query;
-            if (!error) {
-                setRecipes(data);
-                if (typeof count === 'number') setRecommendedTotalCount(Math.min(count, 10));
-            }
-        };
-        fetchRecommendedRecipes();
+        refreshRecommended();
     }, [recommendedPerPage, searchTerm]);
 
     // stránkování doporučených receptů
@@ -79,7 +82,7 @@ export function HomePage() {
         }
     }, [recommendedPerPage, recommendedTotalCount]);
 
-
+//tady jsem si nastavila automatické posouvání obrázků v banneru
     const startAutoSlide = () => {
         clearInterval(intervalRef.current);
         intervalRef.current = setInterval(() => {
@@ -159,7 +162,7 @@ export function HomePage() {
                             Doporučujeme </h2>
 
                         {/* stránkování pro doporučené recepty */}
-                        <Recipes recipes={paginatedRecommended}/>
+                        <Recipes recipes={paginatedRecommended} onFavoriteChange={refreshRecommended}/>
                         {totalRecommendedPages > 1 && (
                             <div className="flex justify-center gap-2 mt-8">
                                 <button

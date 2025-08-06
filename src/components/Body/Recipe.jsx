@@ -13,10 +13,12 @@ import Link from '@mui/joy/Link';
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
 
 
-export function Recipe({ recept, onFavoriteChange }) {
+export function Recipe({ recept, onFavoriteChange, stopPropagation }) {
 
     //nastavení oblíbeného receptu
     const [favorite, setFavorite] = useState(recept.favorite);
+    // stav pro hodnocení
+    const [rating, setRating] = useState(recept.rating);
 
     const handleFavoriteClick = async () => {
         const newFavoriteStatus = !favorite;
@@ -28,6 +30,22 @@ export function Recipe({ recept, onFavoriteChange }) {
             onFavoriteChange();
         }
     }
+
+    // změna hodnocení receptu
+    const handleRatingChange = async (_, newValue) => {
+        if (newValue !== null) {
+            const oldRating = rating;
+            setRating(newValue);
+            const { error } = await supabase.from('recipes').update({ rating: newValue }).eq('id', recept.id);
+            if (error) {
+                setRating(oldRating);
+                // případně zobrazit chybu
+            }
+            if (onFavoriteChange) {
+                onFavoriteChange();
+            }
+        }
+    };
 
     return (
         <Card
@@ -49,18 +67,28 @@ export function Recipe({ recept, onFavoriteChange }) {
                 <img src={recept.image} loading="lazy" alt={recept.title} style={{cursor: 'pointer'}}/>
             </AspectRatio>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-                <a href={`/recept/${recept.id}`} style={{ textDecoration: 'none', color: 'inherit', flex: 1 }} onClick={e => e.stopPropagation()}>
+                <a href={`/recept/${recept.id}`} style={{ textDecoration: 'none', color: 'inherit', flex: 1 }} onClick={e => stopPropagation(e)}>
                     <Typography level="title-lg" sx={{ cursor: 'pointer' }}>
                         {recept.title}
                     </Typography>
                 </a>
-                <IconButton size="sm" variant="plain" color="neutral" onClick={e => { e.stopPropagation(); handleFavoriteClick(); }}>
+                <IconButton size="sm" variant="plain" color="neutral" onClick={e => { stopPropagation(e); handleFavoriteClick(); }}>
                     {favorite ? ( <FavoriteRoundedIcon sx={{ color: 'red' }} />):(<FavoriteBorderRoundedIcon />) }
 
                 </IconButton>
             </Box>
             <Stack spacing={1}>
-                <Rating name="half-rating-read" defaultValue={recept.rating} precision={0.5} readOnly />
+                <Rating
+                    name={`rating-${recept.id}`}
+                    value={Number(rating) || 0}
+                    precision={0.5}
+                    max={5}
+                    onClick={stopPropagation}
+                    onChange={(e, newValue) => {
+                        stopPropagation(e);
+                        handleRatingChange(e, newValue);
+                    }}
+                />
             </Stack>
 
             <Typography level="body-sm">{recept.time}</Typography>
