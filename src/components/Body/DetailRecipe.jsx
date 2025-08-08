@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, useRef} from "react";
 import {useParams, useNavigate, useLocation} from "react-router-dom";
 import {supabase} from "../../supabase.js";
 import Rating from "@mui/material/Rating";
@@ -16,6 +16,8 @@ export function DetailRecipe() {
     const [editMode, setEditMode] = useState(false);
     const [editData, setEditData] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
+    const [editImageFile, setEditImageFile] = useState(null);
+    const editFileInputRef = useRef();
 
     // Načtení receptu podle ID z URL
     useEffect(() => {
@@ -30,7 +32,7 @@ export function DetailRecipe() {
         fetchRecipe();
     }, [id]);
 
-    if (loading) return <div className="pt-40 text-center">Načítání…</div>;
+    if (loading) return <div className="pt-40 text-center">Načítán��…</div>;
     if (error) return <div className="pt-40 text-center text-red-600">{error}</div>;
     if (!recept) return null;
 
@@ -105,17 +107,39 @@ export function DetailRecipe() {
         }));
     };
 
-    // Uložení změn
+    // Funkce pro změnu souboru při editaci
+    const handleEditFileChange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            setEditImageFile(e.target.files[0]);
+            setEditData(prev => ({ ...prev, image: "" })); // smaž url pokud vybírám nový obrázek
+        }
+    };
+
+    // Uložení změn v editaci receptu
     const handleSaveEdit = async (e) => {
         e.preventDefault();
         if (!window.confirm('Opravdu chcete uložit změny v receptu?')) return;
         setLoading(true);
-        const { error } = await supabase.from('recipes').update(editData).eq('id', id);
+        let imageUrl = editData.image;
+        if (editImageFile) {
+            const fileExt = editImageFile.name.split('.').pop();
+            const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
+            const { data: uploadData, error: uploadError } = await supabase.storage.from('recipeimage').upload(fileName, editImageFile, { cacheControl: '3600', upsert: false });
+            if (uploadError) {
+                setError('Chyba při nahrávání obrázku.');
+                setLoading(false);
+                return;
+            }
+            const { data: publicUrlData } = supabase.storage.from('recipeimage').getPublicUrl(fileName);
+            imageUrl = publicUrlData.publicUrl;
+        }
+        const { error } = await supabase.from('recipes').update({ ...editData, image: imageUrl }).eq('id', id);
         setLoading(false);
         if (!error) {
-            setRecept(editData);
+            setRecept({ ...editData, image: imageUrl });
             setEditMode(false);
             setModalOpen(false);
+            setEditImageFile(null);
         } else {
             setError('Chyba při ukládání změn.');
         }
@@ -187,8 +211,8 @@ export function DetailRecipe() {
 
                 </div>
 
-                <img src={recept.image} alt={recept.title}
-                     className="w-full max-h-60 object-cover rounded-lg mb-3 mx-auto shadow"/>
+                <img src={recept.image && recept.image !== "" ? recept.image : "/no-image-icon.jpg"} alt={recept.title}
+                     className="w-full max-h-80 object-cover rounded-lg mb-3 mx-auto shadow"/>
                 <div className="flex gap-2 mb-4 justify-center">
                     <button onClick={handleEdit}
                             className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded font-semibold text-md">
@@ -267,11 +291,7 @@ export function DetailRecipe() {
                                         <input name="title" value={editData.title || ''} onChange={handleEditChange}
                                                className="w-full border rounded p-2" required/>
                                     </div>
-                                    <div>
-                                        <label className="block font-semibold">Obrázek (URL):</label>
-                                        <input name="image" type="text" value={editData.image || ''}
-                                               onChange={handleEditChange} className="w-full border rounded p-2"/>
-                                    </div>
+
                                     <div>
                                         <label className="block font-semibold">Popis (description):</label>
                                         <textarea name="description" value={editData.description || ''}
@@ -329,6 +349,55 @@ export function DetailRecipe() {
                                         <label className="block font-semibold">Oblíbený:</label>
                                         <input name="favorite" type="checkbox" checked={!!editData.favorite}
                                                onChange={handleEditChange} className="ml-2"/>
+                                    </div>
+                                    <div>
+                                        <label className="block font-semibold">Obrázek:</label>
+                                        <div>
+                                            <label htmlFor="edit-image-upload" className="text-teal-600 underline cursor-pointer">
+                                                Vybrat obrázek
+                                            </label>
+                                            <input
+                                                id="edit-image-upload"
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleEditFileChange}
+                                                ref={editFileInputRef}
+                                                className="hidden"
+                                            />
+                                        </div>
+                                        {editImageFile && (
+                                            <div className="relative inline-block mt-2">
+                                                <img src={URL.createObjectURL(editImageFile)} alt="náhled" className="max-h-32 rounded shadow" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => { setEditImageFile(null); setEditData(prev => ({ ...prev, image: "" })); }}
+                                                    className="absolute top-1 right-1 bg-white bg-opacity-80 rounded-full text-red-600 font-bold w-6 h-6 flex items-center justify-center shadow hover:bg-red-100"
+                                                    title="Odebrat obrázek"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        )}
+                                        {/* Pokud není obrázek, zobrazuj defaultní obrázek */}
+                                        {!editImageFile && (!editData.image || editData.image === "") && (
+                                            <div className="relative inline-block mt-2">
+                                                <img src="/no-image-icon.jpg" alt="chybí obrázek" className="max-h-32 rounded shadow opacity-60" />
+                                            </div>
+                                        )}
+                                        {/* Pokud je obrázek, zobrazuj jej */}
+                                        {!editImageFile && editData.image && editData.image !== "" && (
+                                            <div className="relative inline-block mt-2">
+                                                <img src={editData.image} alt="náhled" className="max-h-32 rounded shadow" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => { setEditImageFile(null); setEditData(prev => ({ ...prev, image: "" })); }}
+                                                    className="absolute top-1 right-1 bg-white bg-opacity-80 rounded-full text-red-600 font-bold w-6 h-6 flex items-center justify-center shadow hover:bg-red-100"
+                                                    title="Odebrat obrázek"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="flex gap-2">
                                         <button type="submit"

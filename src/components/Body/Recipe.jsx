@@ -64,7 +64,7 @@ export function Recipe({ recept, onFavoriteChange, stopPropagation }) {
             }}
         >
             <AspectRatio variant="soft" sx={{ width: '100%' }}>
-                <img src={recept.image} loading="lazy" alt={recept.title} style={{cursor: 'pointer'}}/>
+                <img src={recept.image && recept.image !== "" ? recept.image : "/no-image-icon.jpg"} loading="lazy" alt={recept.title} style={{cursor: 'pointer'}}/>
             </AspectRatio>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
                 <a href={`/recept/${recept.id}`} style={{ textDecoration: 'none', color: 'inherit', flex: 1 }} onClick={e => stopPropagation(e)}>

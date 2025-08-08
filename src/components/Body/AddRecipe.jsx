@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../supabase.js";
 import Rating from "@mui/material/Rating";
@@ -15,6 +15,8 @@ export function AddRecipe() {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [imageFile, setImageFile] = useState(null);
+    const fileInputRef = useRef();
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -48,11 +50,33 @@ export function AddRecipe() {
         }));
     };
 
+    const handleFileChange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            setImageFile(e.target.files[0]);
+            setForm(prev => ({ ...prev, image: "" })); // smaž url pokud vybírám nový obrázek
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError("");
-        const { error } = await supabase.from("recipes").insert([form]);
+        let imageUrl = form.image;
+        if (imageFile) {
+            const fileExt = imageFile.name.split('.').pop();
+            const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
+            // upload do supabase storage
+            const { data: uploadData, error: uploadError } = await supabase.storage.from('recipeimage').upload(fileName, imageFile, { cacheControl: '3600', upsert: false });
+            if (uploadError) {
+                setError("Chyba při nahrávání obrázku: " + uploadError.message);
+                setLoading(false);
+                return;
+            }
+            // získej public url
+            const { data: publicUrlData } = supabase.storage.from('recipeimage').getPublicUrl(fileName);
+            imageUrl = publicUrlData.publicUrl;
+        }
+        const { error } = await supabase.from("recipes").insert([{ ...form, image: imageUrl }]);
         setLoading(false);
         if (!error) {
             navigate("/recipes-list");
@@ -71,8 +95,33 @@ export function AddRecipe() {
                         <input name="title" value={form.title} onChange={handleChange} className="w-full border rounded p-2" required />
                     </div>
                     <div>
-                        <label className="block font-semibold">Obrázek (URL):</label>
-                        <input name="image" type="text" value={form.image} onChange={handleChange} className="w-full border rounded p-2" />
+                        <label className="block font-semibold">Obrázek:</label>
+                        <div>
+                            <label htmlFor="image-upload" className="text-teal-600 underline cursor-pointer">
+                                Vybrat obrázek
+                            </label>
+                            <input
+                                id="image-upload"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                                ref={fileInputRef}
+                                className="hidden"
+                            />
+                        </div>
+                        {(imageFile || form.image) && (
+                            <div className="relative inline-block mt-2">
+                                <img src={imageFile ? URL.createObjectURL(imageFile) : form.image} alt="náhled" className="max-h-32 rounded shadow" />
+                                <button
+                                    type="button"
+                                    onClick={() => { setImageFile(null); setForm(prev => ({ ...prev, image: "" })); }}
+                                    className="absolute top-1 right-1 bg-white bg-opacity-80 rounded-full text-red-600 font-bold w-6 h-6 flex items-center justify-center shadow hover:bg-red-100"
+                                    title="Odebrat obrázek"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        )}
                     </div>
                     <div>
                         <label className="block font-semibold">Popis (description):</label>
@@ -129,4 +178,3 @@ export function AddRecipe() {
         </div>
     );
 }
-
