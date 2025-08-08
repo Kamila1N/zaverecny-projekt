@@ -72,6 +72,7 @@ export function Header() {
                 <form className="flex items-center gap-4 px-4 md:w-auto mt-2" onSubmit={handleSearch}>
                     <input
                         type="text"
+                        id="search" // přidáno id
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         placeholder="Vyhledat recept..."

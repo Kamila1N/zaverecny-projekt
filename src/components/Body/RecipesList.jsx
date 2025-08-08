@@ -14,7 +14,15 @@ export function RecipesList() {
     const showFavoritePage = filter === "favorite";
     const [recipes, setRecipes] = useState([]);
     const [page, setPage] = useState(1);
-    const [recipesPerPage, setRecipesPerPage] = useState(15);
+    // Nastav počet receptů podle velikosti okna při inicializaci
+    const getInitialRecipesPerPage = () => {
+        if (window.innerWidth < 560) return 3;
+        if (window.innerWidth < 874) return 6;
+        if (window.innerWidth < 1222) return 9;
+        if (window.innerWidth < 1488) return 12;
+        return 15;
+    };
+    const [recipesPerPage, setRecipesPerPage] = useState(getInitialRecipesPerPage());
     const [totalCount, setTotalCount] = useState(0);
     const query = useQuery();
     const searchTerm = query.get('search')?.toLowerCase() || "";
@@ -38,8 +46,36 @@ export function RecipesList() {
     }, [showFavoritePage, searchTerm, page, recipesPerPage]);
 
     useEffect(() => {
+        setPage(1); // vždy při načtení stránky nastav na první stránku
+    }, []);
+
+    useEffect(() => {
+        // Pokud je offset mimo rozsah, reset na první stránku
+        if ((page - 1) * recipesPerPage >= totalCount && totalCount > 0) {
+            setPage(1);
+        }
+    }, [recipesPerPage, totalCount, page]);
+
+    // Reset stránky na první při změně oblíbených receptů (např. po přidání/odebrání)
+    useEffect(() => {
+        if (showFavoritePage && page > 1 && (page - 1) * recipesPerPage >= totalCount) {
+            setPage(1);
+        }
+    }, [recipes, showFavoritePage, recipesPerPage, totalCount, page]);
+
+    // Reset stránky na první při změně filtru nebo při přechodu na stránku
+    useEffect(() => {
+        setPage(1);
+    }, [filter]);
+
+    // Fetch receptů vždy, když se změní page, recipesPerPage, filter nebo searchTerm
+    useEffect(() => {
+        fetchRecipes(1, recipesPerPage); // vždy fetchuj první stránku po změně filtru
+    }, [filter, recipesPerPage, searchTerm]);
+
+    useEffect(() => {
         fetchRecipes(page, recipesPerPage);
-    }, [fetchRecipes, page, recipesPerPage]);
+    }, [page, recipesPerPage]);
 
     useEffect(() => {
         const handleResize = () => {
@@ -52,12 +88,13 @@ export function RecipesList() {
             setRecipesPerPage(newPerPage);
             setPage(1); // reset na první stránku při změně velikosti okna
         };
-        handleResize();
         window.addEventListener("resize", handleResize);
+        handleResize(); // zavolat až po přidání event listeneru
         return () => {
             window.removeEventListener("resize", handleResize);
         };
     }, []);
+
 
     const totalPages = Math.ceil(totalCount / recipesPerPage);
     const paginatedRecipes = recipes;
